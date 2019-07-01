@@ -24,7 +24,7 @@ async function updateGeoJson(totalDistance) {
 	}
 	// update pin
 	geoJson.features[0].geometry.coordinates = hikerLocation;
-	
+	geoJson.features[0].properties.distanceFromStart = totalDistance;
 	await saveGeoJson(geoJson);
 }
 
