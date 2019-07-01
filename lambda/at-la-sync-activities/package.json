@@ -1,0 +1,12 @@
+{
+  "name": "at-la-sync-activities",
+  "version": "1.0.0",
+  "description": "Sync strava data and update geojson file.",
+  "main": "index.js",
+  "author": "rosenduckboat",
+  "license": "ISC",
+  "dependencies": {
+    "request": "^2.88.0",
+    "request-promise": "^4.2.4"
+  }
+}
