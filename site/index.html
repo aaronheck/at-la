@@ -44,21 +44,31 @@
             content: "250 miles down"
           });
         map.data.addListener('click', function(event) {
-          var distanceFromStart = (event.feature.getProperty("distanceFromStart") * 0.000621371).toFixed(2);
-          var toGo = 2190 - distanceFromStart
-          infowindow.setContent("<div style='width:150px; text-align:center;'>"+ distanceFromStart +" miles down " + toGo + " to go! </div>");
-          // position the infowindow on the marker
-          infowindow.setPosition(event.feature.getGeometry().get());
-          // anchor the infowindow on the marker
-          infowindow.setOptions({pixelOffset: new google.maps.Size(0,-30)});
-          infowindow.open(map);
+          if(event.feature.getProperty("distanceFromStart")) {
+            var distanceFromStart = (event.feature.getProperty("distanceFromStart") * 0.000621371).toFixed(2);
+            var toGo = (2190 - distanceFromStart).toFixed(2)
+            infowindow.setContent("<div style='width:150px; text-align:center;'>"+ distanceFromStart +" miles down " + toGo + " to go! </div>");
+            // position the infowindow on the marker
+            infowindow.setPosition(event.feature.getGeometry().get());
+            // anchor the infowindow on the marker
+            infowindow.setOptions({pixelOffset: new google.maps.Size(0,-30)});
+            infowindow.open(map);
+          }
         });
       }
 
     </script>
 
     <!-- Replace the access key below. removing it from source code because google sends me emails thinking it leaked even though it needs to be exposerd to the public in my website anyway. -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=<>&callback=initMap&libraries=geometry"
+    <script src="https://maps.googleapis.com/maps/api/js?key=<key>&callback=initMap&libraries=geometry"
     async defer></script>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-53774413-1', 'auto');
+      ga('send', 'pageview');
+    </script>
   </body>
 </html>
