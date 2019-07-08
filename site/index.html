@@ -22,6 +22,20 @@
     <div id="map"></div>
     <script>
       var map;
+      function daysBetween( date1, date2 ) {
+        //Get 1 day in milliseconds
+        var one_day=1000*60*60*24;
+
+        // Convert both dates to milliseconds
+        var date1_ms = date1.getTime();
+        var date2_ms = date2.getTime();
+
+        // Calculate the difference in milliseconds
+        var difference_ms = date2_ms - date1_ms;
+          
+        // Convert back to days and return
+        return Math.round(difference_ms/one_day); 
+      }
       function initMap() {
 
         map = new google.maps.Map(document.getElementById('map'), {
@@ -46,8 +60,15 @@
         map.data.addListener('click', function(event) {
           if(event.feature.getProperty("distanceFromStart")) {
             var distanceFromStart = (event.feature.getProperty("distanceFromStart") * 0.000621371).toFixed(2);
-            var toGo = (2190 - distanceFromStart).toFixed(2)
-            infowindow.setContent("<div style='width:150px; text-align:center;'>"+ distanceFromStart +" miles down " + toGo + " to go! </div>");
+            var toGo = (2190 - distanceFromStart).toFixed(2);
+            // Sunday, June 9, 2019 6:30:00 AM Pacific Time
+            var daysSinceStart = daysBetween(new Date(1560087000000), new Date());
+            var avgMilesPerDay = (distanceFromStart / daysSinceStart);
+            var daysLeft = Math.ceil(toGo / avgMilesPerDay);
+            var completionDate = new Date();
+            completionDate.setDate(completionDate.getDate() + daysLeft);
+            completionDate = completionDate.toString().split(" ").slice(0,4).join(" ")
+            infowindow.setContent("<div style='width:150px; text-align:center;'> <h3>ATLA</h3>"+ distanceFromStart +" miles down " + toGo + " to go! <br><br> Avg Miles/ Day: " + avgMilesPerDay.toFixed(2) + " <br><br> Estimated completion date: " + completionDate + "</div>");
             // position the infowindow on the marker
             infowindow.setPosition(event.feature.getGeometry().get());
             // anchor the infowindow on the marker
@@ -60,7 +81,7 @@
     </script>
 
     <!-- Replace the access key below. removing it from source code because google sends me emails thinking it leaked even though it needs to be exposerd to the public in my website anyway. -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=<key>&callback=initMap&libraries=geometry"
+    <script src="https://maps.googleapis.com/maps/api/js?key=<>&callback=initMap&libraries=geometry"
     async defer></script>
     <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
