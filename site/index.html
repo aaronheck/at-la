@@ -5,21 +5,160 @@
     <meta name="viewport" content="initial-scale=1.0">
     <meta charset="utf-8">
     <style>
-      /* Always set the map height explicitly to define the size of the div
-       * element that contains the map. */
       #map {
         height: 100%;
       }
-      /* Optional: Makes the sample page fill the window. */
       html, body {
         height: 100%;
         margin: 0;
         padding: 0;
       }
+      #overlay {
+        position: fixed; /* Sit on top of the page content */
+        width: 100%; /* Full width (cover the whole page) */
+        height: 100%; /* Full height (cover the whole page) */
+        top: 0; 
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(12, 88, 52,0.70); /* Black background with opacity */
+        z-index: 1; /* Specify a stack order in case you're using a different order for other elements */
+        color: white;
+        font-family: Verdana,Geneva,sans-serif; 
+      }
+
+      ::-webkit-scrollbar {
+          width: 0px;  /* Remove scrollbar space */
+      }
+
+      h1 {
+        color: white;
+        text-align: center;
+      }
+
+      #scrollable {
+        padding-right: 10%;
+        padding-left: 10%;
+        overflow: scroll;
+        height: calc(100% - 60px); /* Not sure why this is 60px.*/
+      }
+      #footer {
+        position: fixed; /* Sit on top of the page content */
+        height: 75px;
+        background: rgb(12, 88, 52);
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-family: Verdana,Geneva,sans-serif; 
+        z-index: 2;
+      }
+
+      #footer-contents {
+        margin: 20px;
+      }
+
+      #footer:hover {
+        cursor: pointer;
+      }
+
+      .question {
+        font-size: 105%;
+        font-weight: bold;
+        /*background-color: rgba(12, 88, 52,0.8);*/
+      }
+      .answer {
+        /*background-color: rgba(12, 88, 52,0.85);*/
+      }
+
+      .faq {
+        margin-bottom: 10px;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      #show-tech:hover {
+        cursor: pointer;
+      }
+
+      #show-tech {
+        color: #9e9eff;
+      }
     </style>
   </head>
   <body>
+    <div id="overlay">
+      <div id="scrollable">
+        <h1> Appalachian Trail, Los Angeles </h1>
+        <h3>What This Is</h3>
+        <p>2,190 miles, 464,464 feet of elevation, 14 states, and I have to presume a few million holes filled with human poop. Each spring thousands of hikers attempt the 5 to 7 month journey along the Appalachian Trail from Georgia to Maine. For the past 8 years I've dreamt of completing this pilgramage through nature... but frankly I can't take that kind of time off work. So I've decided to just do it around Los Angeles instead. I realized my favorite thing about the Appalchian Trail is the awesome before and after pics -- physically fit clean shaven smiling guy with backpack becomes slightly underweight bearded smiling guy with backpack and dirt on face. So on June 9, 2019 I decided to not cut my hair or shave my face until I run + walk 2,190 miles.</p>
+
+        <h3>Rules</h3>
+        <p>Distance covered must be by foot, must be outside (steps around the office don't count), and must be captured on my GPS watch. And the no shaving/ cutting hair thing.</p>
+
+        <h3>FAQs</h3>
+        <!-- Collapsible but first is auto open. -->
+        <div>
+          <div class='faq'>
+            <div class='question'><!-- <span class='toggle'>-<span> --> Where are you now?</div>
+            <div class='answer'>Click the bottom footer and see my progress superimposed on a map of the Appalachian Trail. Green is what I've completed.</div>
+          </div>
+          <div class='faq'>
+            <div class='question'><!-- <span class='toggle'>+<span> --> How many miles a day?</div>
+            <div class='answer'>On the map click the pin to see up to date stats including average miles a day. A typical weekday I run 1.25 miles to the boat to meet Josh and Matt for 6:30AM roll call at the trailhead. We go on a 1 mile hike to Starbucks. After Starbucks I go on my normal workout run (usually anywhere from 3 to 10 mile good paced run). Then I get home and shower for my 3 mile walk down Abbot Kinney to work. I usually get in around 10AM. During lunch I go on a 1.5 mile "meeting the neighbors" walk with Ryan. We stop by local business and to say hello. Then after work I walk the 3 miles back home. On Saturdays I usually take the day off. Sundays I usually go on a 13 mile run.</div>
+          </div>
+          <div class='faq'>
+            <div class='question'>What about elevation gain?</div>
+            <div class='answer'>Screw elevation. I'm doing this sucker flat.</div>
+          </div>
+          <div class='faq'>
+            <div class='question'>I want to do the same thing but without the not cutting my hair part. Can you make a site to superimpose my workouts on [insert trail or state or country or continent or other geographical feature].</div>
+            <div class='answer'>Yeah sure maybe ok</div>
+          </div>
+          <div class='faq'>
+            <div class='question'>Ok so where is the before picture?</div>
+            <div class='answer'>I'll post it in a bit.</div>
+          </div>
+          <div class='faq'>
+            <div class='question'>Did you code all this website with your bare hands? How does it work?</div>
+            <div class='answer'>Yep, with my bare hands. <span id="show-tech">Click here for a semi-technical overview of how it works.</span>
+
+              <div id="tech-exp" class="hidden"><br>The front end is a static webstie hosted in S3. I use the google maps JS api backed by geojson for the data layer. The geoJson file has 2 segments -- completed and incomplete. Each segment is just a list of coordinates that get drawn on the map. In geojson each coordiante is an array of length 2 or 3. The first 2 elements are lat and long and the third element can be elvation but I do not need elevation for this (see previous FAQ) so I hijacked the third element and stored a precomputed "distance from start" for the coordinate. This makes things easier in the backend.
+            <br><br>
+            Backend: I record all of my hikes on my Garmin Forerunner 245. It syncs with my phone. The Garmin API is a few thousand dollars to get access to so I have Garmin auto export all my workouts to Strava (feature of there app). I have an AWS Lambda function that executes every 6 hours and syncs my Strava data to my internal data store. I sum my total distance traveled since June 9th and update the aforementioned geojson file. I iterate the "incomplete" segment and move the coordinate to the completed segment if its precomputed distance from start of trail is less than the total distance I traveled since June 9th. <br> <br>
+
+            Ok on second thought I didn't want to read that. Now how can I collapse it again? <br>
+            you cant.... I didn't feel like writing the JS. 
+            </div> </div>
+          </div>
+        </div>
+
+        <h3>Ongoing List of Thoughts</h3>
+        <ul>
+          <li>Goals don't have to make sense. Having such strong commitment to a silly and not completely fleshed out project is the real merrit of this.</li>
+          <li>Pick up pieces of garbage.</li>
+          <li>Getting up early is great. </li>
+          <li>Staying true to the social aspect of the Eastern Appalachian Trail my morning hike and lunch hike with friends are consistently my favorite parts of the day.</li>
+          <li>My beard isn't as patchy as a I thought it would be and doesn't look bad as I expected (at least not at week 6).</li>
+          <li>At first making my 20 minute bike ride into an hour long commute seemed dumb. But now I realized being outside makes me happy. Nature doesn't have to be untouched by humans. I still have time to watch TV each night.</li>
+          <li>It's AppalaCHIAN not AppalaCHAIN.</li>
+          <li>It is really cool to see the ground I am covering. It is fun to check in on the map to see where I am and read a bit about the area.</li>
+          <li>Worst get rich quick scheme ever.</li>
+        </ul>
+      </div>      
+    </div>
     <div id="map"></div>
+    <div id="footer">
+      <h4 id="footer-contents">
+        <span id="hide-words">Click here to hide the words and see the map. Then click on the red marker for some neato stats.</span>
+        <span id="show-words" class="hidden">Click here to show the words again that tell me what I am looking at.</span>
+      </h4>
+    </div>
     <script>
       var map;
       function daysBetween( date1, date2 ) {
@@ -58,6 +197,7 @@
             content: "250 miles down"
           });
         map.data.addListener('click', function(event) {
+          ga('send', 'event', 'current-locmarker', 'click');
           if(event.feature.getProperty("distanceFromStart")) {
             var distanceFromStart = (event.feature.getProperty("distanceFromStart") * 0.000621371).toFixed(2);
             var toGo = (2190 - distanceFromStart).toFixed(2);
@@ -77,6 +217,26 @@
           }
         });
       }
+
+       document.getElementById('show-tech').onclick = function(){
+          document.getElementById('tech-exp').classList.remove("hidden");
+          ga('send', 'event', 'explain-tech', 'click');
+        };
+        
+        const footerToggleElements = [
+          document.getElementById('overlay'), 
+          document.getElementById('show-words'), 
+          document.getElementById('hide-words')];
+
+        const pageNames = ['/words', '/map'];
+        let page = true;
+        document.getElementById('footer').onclick = function(){
+          ga('set', 'page', pageNames[page ? 1 : 0]);
+          ga('send', 'event', 'footer', 'click');
+          page = !page;
+          footerToggleElements.forEach(e => e.classList.toggle("hidden"))
+        };
+
 
     </script>
 
