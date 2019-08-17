@@ -89,6 +89,14 @@
       #show-tech {
         color: #9e9eff;
       }
+
+      .gallery > img {
+        height: 200px;
+      }
+
+      .gallery {
+        overflow: scroll;
+      }
     </style>
   </head>
   <body>
@@ -121,10 +129,6 @@
             <div class='answer'>Yeah sure maybe ok</div>
           </div>
           <div class='faq'>
-            <div class='question'>Ok so where is the before picture?</div>
-            <div class='answer'>I'll post it in a bit.</div>
-          </div>
-          <div class='faq'>
             <div class='question'>Did you code all this website with your bare hands? How does it work?</div>
             <div class='answer'>Yep, with my bare hands. <span id="show-tech">Click here for a semi-technical overview of how it works.</span>
 
@@ -137,6 +141,12 @@
             </div> </div>
           </div>
         </div>
+
+<!--         <h3>Update Pics</h3>
+        <div class="gallery">
+          <img src="/pics/before.JPG" alt="before">
+          <img src="/pics/week_6.JPG" alt="week 6">
+        </div> -->
 
         <h3>Ongoing List of Thoughts</h3>
         <ul>
@@ -159,6 +169,7 @@
         <span id="show-words" class="hidden">Click here to show the words again that tell me what I am looking at.</span>
       </h4>
     </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script>
       var map;
       function daysBetween( date1, date2 ) {
@@ -182,7 +193,7 @@
         });
         map.fitBounds(new google.maps.LatLngBounds({lat: 34.626688, lng: -84.193892}, {lat: 45.90424, lng: -68.921152}))
         map.data.loadGeoJson(
-          'http://aaronrosenheck.com/data/centerline.json');
+          'http://aaronrosenheck.com/data/route-1.json');
 
         map.data.setStyle(function(feature) {
           var color = feature.getProperty('color');
@@ -241,7 +252,7 @@
     </script>
 
     <!-- Replace the access key below. removing it from source code because google sends me emails thinking it leaked even though it needs to be exposerd to the public in my website anyway. -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=<>&callback=initMap&libraries=geometry"
+    <script src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap&libraries=geometry"
     async defer></script>
     <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

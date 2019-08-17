@@ -10,6 +10,7 @@ def main():
 	
 	gpx_root = load_gpx(input_file_path)
 	points = get_tracking_points_from_gpx(gpx_root)
+	print len(points)
 
 	coords_with_distances = get_coordinates_with_distance(points)
 	current_point = createFeature('white', coords_with_distances[0], 'Point')
@@ -20,11 +21,11 @@ def main():
 	write_geojson_to_file(geojson, output_file_path)
 
 def load_gpx(input_file_path):
-	tree = ET.parse('/Users/aaronrosenheck/Documents/at/misc/geojson-prep/at_centerline_full_10k_split_500.gpx')
+	tree = ET.parse('/Users/aaronrosenheck/Documents/at-la/misc/geojson-prep/melch-route.gpx')
 	return tree.getroot()
 
 def get_tracking_points_from_gpx(gpx_root):
-	points = gpx_root.findall('.//{http://www.topografix.com/GPX/1/0}trkpt')
+	points = gpx_root.findall('.//{http://www.topografix.com/GPX/1/1}trkpt')
 	return list(map(lambda point: (float(point.attrib['lat']), float(point.attrib['lon'])), points))
 
 def get_coordinates_with_distance(points):
@@ -33,7 +34,8 @@ def get_coordinates_with_distance(points):
 	for i in range(len(points) - 1):
 		distance = geopy.distance.distance(points[i], points[i + 1]).m
 		total_distance += distance
-		coordinates.append(list(points[i + 1][::-1] + (total_distance, )))
+		# coordinates.append(list(points[i + 1][::-1] + (total_distance, )))
+		coordinates.append(list(points[i + 1][::-1]))
 	return coordinates
 
 def write_geojson_to_file(geojson, output_file_path):

@@ -1,11 +1,11 @@
 const stravaSecrets = require('./strava-secrets')
 const rp = require('request-promise');
 
-async function StravaFacade() {
+async function StravaFacade(userId) {
     const accessToken = await (async () => {
         // Returns new access token and persists refresh token for next time.
         // made anonymous as to not tempt anybody to call this multiple times.
-        let secrets = await stravaSecrets.getSecrets();
+        let secrets = await stravaSecrets.getSecrets(userId);
         let refreshOptions = {
             method: 'POST',
             uri: 'https://www.strava.com/oauth/token',
@@ -18,7 +18,7 @@ async function StravaFacade() {
         };
         let stravaResponse = JSON.parse(await rp(refreshOptions));
         secrets['refresh-token'] = stravaResponse['refresh_token'];
-        await stravaSecrets.saveSecrets(secrets);
+        await stravaSecrets.saveSecrets(userId, secrets);
         return stravaResponse['access_token'];
     })();
 
@@ -27,7 +27,7 @@ async function StravaFacade() {
         let page = 1;
         let activities = [];
         // This API is silly sauce. 
-        // Only know that there are no matter actvities when they return a page w/ 0 results.
+        // Only know that there are no more actvities when they return a page w/ 0 results.
         let latestPageReturnedResults;
         do {
         	let pageOfActivities = await getActivitiesAfter(date, page);

@@ -6,6 +6,7 @@
   "author": "rosenduckboat",
   "license": "ISC",
   "dependencies": {
+    "geolib": "^3.0.4",
     "request": "^2.88.0",
     "request-promise": "^4.2.4"
   }

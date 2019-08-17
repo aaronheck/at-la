@@ -6,9 +6,11 @@ const geoJsonClient = require('./geojson-client')
 
 // Fun Game: Count the race conditions.
 exports.handler = async function(event) {
-    const facade = await stravaFacade.StravaFacade();
-    const allowedActivities = new Set(["Run", "Walk", "Hike"]);
-    const activityStorageClient =  await activityStorage.ActivityStorageClient();
+    const userId = event.userId;
+    const facade = await stravaFacade.StravaFacade(userId);
+
+    const activityStorageClient =  await activityStorage.ActivityStorageClient(userId);
+    const allowedActivities = new Set(activityStorageClient.getAllowedActivities());
     let newActivities = (await facade.getAllActivitiesAfter(activityStorageClient.getLastActivityStart()))
     	.filter(activity => allowedActivities.has(activity.type))
     	.map(activity => ({
@@ -17,13 +19,12 @@ exports.handler = async function(event) {
     		id: activity['id'], 
     		type: activity['type'], 
     		elapsedTime: activity['elapsed_time']}));
-    console.log("New activities fetched: " + newActivities.length);
     await activityStorageClient.saveNewActivities(newActivities);
 
     let totalDistance = activityStorageClient.getTotalDistance();
     console.log("Total Distance: " + totalDistance);
 
-    await geoJsonClient.updateGeoJson(totalDistance);
+    await geoJsonClient.updateGeoJson(userId, totalDistance);
 
-    return "Great Hiking!";
+    return "Great Hiking! " + "New activities fetched: " + newActivities.length;
 };
