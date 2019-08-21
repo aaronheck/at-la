@@ -1,121 +1,171 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Appalachian Trail, Los Angeles</title>
+    <title>THE TR3K</title>
     <meta name="viewport" content="initial-scale=1.0">
     <meta charset="utf-8">
+    <link rel="shortcut icon" type="image/x-icon" href="images/favicon.png"/>
+    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+
     <style>
-      #map {
-        height: 100%;
-      }
       html, body {
         height: 100%;
         margin: 0;
         padding: 0;
-      }
-      #overlay {
-        position: fixed; /* Sit on top of the page content */
-        width: 100%; /* Full width (cover the whole page) */
-        height: 100%; /* Full height (cover the whole page) */
-        top: 0; 
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(12, 88, 52,0.70); /* Black background with opacity */
-        z-index: 1; /* Specify a stack order in case you're using a different order for other elements */
-        color: white;
-        font-family: Verdana,Geneva,sans-serif; 
+        font-family: 'Roboto', sans-serif;
+        overflow-x: hidden;
+
       }
 
-      ::-webkit-scrollbar {
-          width: 0px;  /* Remove scrollbar space */
-      }
-
-      h1 {
-        color: white;
-        text-align: center;
-      }
-
-      #scrollable {
-        padding-right: 10%;
-        padding-left: 10%;
-        overflow: scroll;
-        height: calc(100% - 60px); /* Not sure why this is 60px.*/
-      }
-      #footer {
-        position: fixed; /* Sit on top of the page content */
-        height: 75px;
-        background: rgb(12, 88, 52);
-        left: 0;
-        bottom: 0;
+      .full-width {
         width: 100%;
+      }  
+
+      .twothirds-width {
+        width: 66%;
+      }  
+
+      .stats-row {
+        display: inline-flex;
+        text-align: center;
+        width: 100%;
+      }
+
+      .stat {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        padding-left: 5px;
+        padding-right: 5px;
+        flex: 1;
+        height: 75px;
+      }
+
+      .right-border {
+        border-right: 3px solid #e6e6e6;
+      }
+
+      .stat-number {
+        /*TODO: actually align vertically center*/
+        padding-top: 10px;
+        font-size: 25px;
+        font-weight: bold;
+      }
+
+      .stat-label {
+        font-weight: bold;
+      }
+
+      .words {
+        height: 2px;
+        background: #e6e6e6;
+      }
+
+      .newyorker {
+        width: 100%;
+        display: flex;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .newyorker {
+        cursor: pointer;
+      }
+
+      #map {
+        width: 100%;
+        height: 50vh;
+      }
+
+      #footer {
+        width: 100%;
+        height: 75px;
+        background: black;
+        color: white;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
-        font-family: Verdana,Geneva,sans-serif; 
-        z-index: 2;
+        letter-spacing: 7px;
+        text-decoration: none;
       }
 
-      #footer-contents {
-        margin: 20px;
-      }
-
-      #footer:hover {
-        cursor: pointer;
-      }
-
-      .question {
-        font-size: 105%;
-        font-weight: bold;
-        /*background-color: rgba(12, 88, 52,0.8);*/
-      }
-      .answer {
-        /*background-color: rgba(12, 88, 52,0.85);*/
-      }
-
-      .faq {
-        margin-bottom: 10px;
-      }
-
-      .hidden {
-        display: none;
-      }
-
-      #show-tech:hover {
-        cursor: pointer;
-      }
-
-      #show-tech {
-        color: #9e9eff;
-      }
-
-      .gallery > img {
-        height: 200px;
-      }
-
-      .gallery {
-        overflow: scroll;
+      a {
+        text-decoration: none;
       }
     </style>
   </head>
   <body>
-    <div id="overlay">
-      <div id="scrollable">
-        <h1>NJ to CA</h1>
-        Dad's Map
-      </div>      
+
+    <div>
+      <section>
+        <img class="full-width" src="./images/header.png" />
+      </section>
+      <section>
+        <div class="stats-row">
+          <span class="stat right-border">
+            <div class="stat-number" id="complete-stat">-</div>
+            <div class="stat-label">COMPLETE</div>
+          </span>
+          <span class="stat right-border">
+            <div class="stat-number" id="days-stat">-</div>
+            <div class="stat-label">DAYS</div>
+          </span>
+          <span class="stat">
+            <div class="stat-number" id="togo-stat">-</div>
+            <div class="stat-label">TO GO</div>
+          </span>
+        </div>
+      </section>
+      <section class="words">
+        
+      </section>
+      <section class="newyorker">
+        <img class="twothirds-width" src="./images/newyorker.png" />
+      </section>
+
+      <section>
+        <div id="map">
+        </div>
+      </section>
+
+      <section>
+        <a id="footer" href="/dad-map.html">
+          VIEW MAP FULL SCREEN
+        </a>
+      </section>
+
     </div>
-    <div id="map"></div>
-    <div id="footer">
-      <h4 id="footer-contents">
-        <span id="hide-words">Click here to hide the words and see the map. Then click on the red marker for some neato stats.</span>
-        <span id="show-words" class="hidden">Click here to show the words again that tell me what I am looking at.</span>
-      </h4>
-    </div>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
     <script>
       var map;
+      
+      var geoJson = $.get( "http://aaronrosenheck.com/data/route-2.json");
+
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 7
+        });
+
+        map.fitBounds(new google.maps.LatLngBounds({lat: 27.407675300459257, lng:  -119.9535708983816}, {lat: 49.94896541990294, lng: -72.5805240233816}))
+        geoJson.done((data) => {
+          map.data.addGeoJson(data);
+          initStats(data);
+        });
+
+        map.data.setStyle(function(feature) {
+          var color = feature.getProperty('color');
+          return {
+            strokeColor: color,
+            strokeWeight: 3,
+          };
+        });
+
+        $(".newyorker").on("click", ()=> window.location="/newyorker.pdf")
+      }
+
       function daysBetween( date1, date2 ) {
         //Get 1 day in milliseconds
         var one_day=1000*60*60*24;
@@ -128,51 +178,22 @@
         var difference_ms = date2_ms - date1_ms;
           
         // Convert back to days and return
-        return Math.round(difference_ms/one_day); 
+        return Math.floor(difference_ms/one_day); 
       }
-      function initMap() {
 
-        map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 7
-        });
-
-//         {
-//   "south": 27.407675300459257,
-//   "west": -119.9535708983816,
-//   "north": 49.94896541990294,
-//   "east": -72.5805240233816
-// }
-        map.fitBounds(new google.maps.LatLngBounds({lat: 27.407675300459257, lng:  -119.9535708983816}, {lat: 49.94896541990294, lng: -72.5805240233816}))
-        map.data.loadGeoJson(
-          'http://aaronrosenheck.com/data/route-2.json');
-
-        map.data.setStyle(function(feature) {
-          var color = feature.getProperty('color');
-          return {
-            strokeColor: color,
-            strokeWeight: 3,
-            // icon: "marker.png"
-          };
-        });
+      function initStats(data) {
+        let distanceFromStart = data.features[0].properties.distanceFromStart;
+        let distanceFromStartFormatted = (data.features[0].properties.distanceFromStart * 0.000621371).toLocaleString(undefined, {maximumFractionDigits: 1});
+        let toGoFormatted = (3000 - (data.features[0].properties.distanceFromStart * 0.000621371)).toLocaleString(undefined, {maximumFractionDigits: 1});
+        let togo = 3000 - distanceFromStart; 
+        $("#complete-stat").text(distanceFromStartFormatted);
+        $("#days-stat").text(daysBetween(new Date(1566233074000), new Date()))
+        $("#togo-stat").text(toGoFormatted);
       }
-        
-        const footerToggleElements = [
-          document.getElementById('overlay'), 
-          document.getElementById('show-words'), 
-          document.getElementById('hide-words')];
-
-        const pageNames = ['/words', '/map'];
-        let page = true;
-        document.getElementById('footer').onclick = function(){
-          console.log(map.getBounds());
-          ga('set', 'page', pageNames[page ? 1 : 0]);
-          ga('send', 'event', 'footer', 'click');
-          page = !page;
-          footerToggleElements.forEach(e => e.classList.toggle("hidden"))
-        };
 
 
     </script>
+    
 
     <!-- Replace the access key below. removing it from source code because google sends me emails thinking it leaked even though it needs to be exposerd to the public in my website anyway. -->
     <script src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap&libraries=geometry"
