@@ -5,7 +5,7 @@ const {promisify} = require('util');
 const gzip = promisify(zlib.gzip);
 const gunzip = promisify(zlib.gunzip);
 const s3 = new AWS.S3({apiVersion: '2006-03-01', region: 'us-east-1'});
-const bucket = "aaronrosenheck.com";
+const bucket = {"1": "aaronrosenheck.com", "2": "thetr3k.com"};
 
 
 // only expose this
@@ -61,7 +61,7 @@ function getKey(userId) {
 
 async function getGeoJson(userId) {
 	var params = {
-	  Bucket: bucket,
+	  Bucket: bucket[userId],
 	  Key: getKey(userId),
 	};
 	return s3.getObject(params).promise().then(response => {
@@ -72,10 +72,11 @@ async function getGeoJson(userId) {
 
 async function saveGeoJson(geoJson, userId) {
 	var params = {
-	  Bucket: bucket,
+	  Bucket: bucket[userId],
 	  Key: getKey(userId),
 	  Body: await gzip(JSON.stringify(geoJson)),
 	  ContentType: 'application/json',
+	  CacheControl: 'no-cache, no-store, must-revalidate',
 	  ContentEncoding: 'gzip'
 	};
 	return s3.putObject(params).promise();

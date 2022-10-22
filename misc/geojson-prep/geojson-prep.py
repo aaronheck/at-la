@@ -5,27 +5,27 @@ import xml.etree.ElementTree as ET
 
 
 def main():
-	input_file_path = sys.argv[1]
-	output_file_path = sys.argv[2]
-	
-	gpx_root = load_gpx(input_file_path)
+	# input_file_path = sys.argv[1]
+	# output_file_path = sys.argv[2]
+	output_file_path = 	"/Users/aaronrosenheck/Documents/at-la/misc/geojson-prep/big.json"
+	gpx_root = load_gpx()
 	points = get_tracking_points_from_gpx(gpx_root)
 	print len(points)
 
 	coords_with_distances = get_coordinates_with_distance(points)
 	current_point = createFeature('white', coords_with_distances[0], 'Point')
-	current_point['properties']['distance-from-start'] = 0.0
+	current_point['properties']['distanceFromStart'] = 0.0
 	completed_feature = createFeature('green', [coords_with_distances[0]], 'LineString')
 	incomplete_feature = createFeature('red', coords_with_distances, 'LineString')
 	geojson = {'type': 'FeatureCollection', 'features': [current_point, completed_feature, incomplete_feature]}
 	write_geojson_to_file(geojson, output_file_path)
 
-def load_gpx(input_file_path):
-	tree = ET.parse('/Users/aaronrosenheck/Documents/at-la/misc/geojson-prep/melch-route.gpx')
+def load_gpx():
+	tree = ET.parse('/Users/aaronrosenheck/Documents/at-la/misc/geojson-prep/at_centerline_full.gpx')
 	return tree.getroot()
 
 def get_tracking_points_from_gpx(gpx_root):
-	points = gpx_root.findall('.//{http://www.topografix.com/GPX/1/1}trkpt')
+	points = gpx_root.findall('.//{http://www.topografix.com/GPX/1/0}trkpt')
 	return list(map(lambda point: (float(point.attrib['lat']), float(point.attrib['lon'])), points))
 
 def get_coordinates_with_distance(points):
